@@ -1,0 +1,151 @@
+﻿
+template <class T>
+MPQueue<T>::MPQueue(MPNode<T> mpArr[], int arrSize)
+{
+	//构造函数，申请一个动态数组
+	MaxSize = 1000;
+	heap = new MPNode<T>[MaxSize+1];
+	//heap = mpArr;
+	for (int i = 1; i <= arrSize; i++)
+	{
+		heap[i] = mpArr[i-1];
+	}
+	CurrenSize = arrSize;
+}
+
+template <class T>
+MPQueue<T>::~MPQueue()
+{
+	delete [] heap;
+}
+
+template <class T>
+void MPQueue<T>::exchange(int swapA, int swapB)
+{
+	T bufferValue;
+	int bufferKey;
+
+	//交换
+	bufferValue = heap[swapA].getValue();
+	bufferKey = heap[swapA].getKey();
+
+	heap[swapA].setValue(heap[swapB].getValue());
+	heap[swapA].setKey(heap[swapB].getKey());
+
+
+	heap[swapB].setKey(bufferKey);
+	heap[swapB].setValue(bufferValue);
+}
+
+template <class T>
+void MPQueue<T>::BuildMaxHeap()
+{
+	for (int i = CurrenSize/2; i >= 1; i--) 
+	{
+		MPNode<T> y = heap[i];
+		int c = 2 * i;
+		while (c <= CurrenSize) 
+		{
+			if (c < CurrenSize && heap[c].getKey() < heap[c+1].getKey()) 
+				c++;
+			if (y.getKey() >= heap[c].getKey())
+				break; 
+			heap[c/2] = heap[c];
+			c *= 2;
+		}
+		heap[c/2] = y;
+	}
+}
+
+template <class T>
+int MPQueue<T>::getRight(int i)
+{
+	//直接返回节点，是否存在要在调用的地方判断
+	return 2 * i + 1;
+}
+
+template <class T>
+int MPQueue<T>::getLeft(int i)
+{
+	//直接返回节点，是否存在要在调用的地方判断
+	return 2 * i;
+}
+
+template <class T>
+void MPQueue<T>::MaxHeapify(int i)
+{
+	//int L, R, largest;
+	//L = this->getLeft(i);
+	//R = this->getRight(i);
+	//
+	//if (L <= CurrenSize && R <= CurrenSize && heap[L].getKey() < heap[R].getKey())
+	//{//如果左边的比右边的小，交换一下
+	//	exchange(L, R);
+	//}
+
+	//if (L <= CurrenSize && heap[L].getKey() > heap[i].getKey())
+	//{
+	//	largest = L;
+	//}
+	//else
+	//{
+	//	largest = i;
+	//}
+
+	//if (largest != i)
+	//{
+	//	exchange(i, largest);
+	//	MaxHeapify(largest);
+	//	exchange(L, R);
+	//}
+
+
+}
+
+
+
+template <class T>
+void MPQueue<T>::Insert(MPNode<T> x)
+{
+
+}
+
+template <class T>
+T MPQueue<T>::MaxValue()
+{
+	if (CurrenSize == 0)
+	{
+		throw exception("no element");
+	}
+	return heap[1].getValue();
+}
+
+template <class T>
+void MPQueue<T>::IncreaseKey(MPNode<T> x, int key)
+{
+
+}
+
+template <class T>
+T MPQueue<T>::ExtractMax()
+{
+	int max;//键值最大的键
+	if (CurrenSize == 0)
+	{
+		throw exception("no element");
+	}
+	max = heap[0].getValue();
+	heap[0].setValue() = heap[CurrenSize--].getValue();//将最后一个元素放到根节点，并且当前大小减一
+	MaxHeapify(0);//堆化
+}
+	////定义一个20个元素的数组
+	//MPNode<int> arr[20];
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	arr[i].setValue(rand());
+	//	arr[i].setKey(i);
+	//}
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	cout << arr[i].getValue() << "\t" << arr[i].getKey() << endl;
+	//}

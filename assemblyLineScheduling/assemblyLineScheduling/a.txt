@@ -1,0 +1,366 @@
+/*****************************************************
+* Copyright (c) 2015,***部门
+* All rights reserved.
+*
+* File name：FastestWay.cpp
+* Description：装配线问题算法
+*
+* Version：1.0
+* Author：王春城
+* Date：2015年4月23日
+*
+* History:
+*
+******************************************************/
+#include <iostream>
+#define MAXASSEMBLE 10000
+using namespace std;
+/*************************************************   
+Function:       FastestWay    
+Description:   @brief Get the fast way in the assembly line schedule
+Calls:          无
+Called By:      main   
+Input:          @param a[][MAXASSEMBLE]: a[i][j] means the time consumed in j'th assembly station of i'th AssemblyLine. The index of j is from 0 to n-1.
+				@param t[][MAXASSEMBLE]: t[i][j] means the time consumed to move object from j'th station in i'th AssemblyLine to j+1'th station in the other AssemblyLine. The index of j is from 0 to n-2.
+				@param e: e[i] means the time consumed to move object from start station to 0'th station in i'th AssemblyLine.
+				@param x: x[i] means the time consumed to move object from n-1'th station in i'th AssemblyLine to end station.
+				@param n: the station number in AssemblyLine.
+				@param time: the least time consumed to move object from start station to end station.
+				@param line[][MAXASSEMBLE]: line[i][j] means the pre-station's AssemblyLine number of station j+1 in AssemblyLine i.
+				@param lastLine: the pre-station's AssemblyLine number of the end station.   
+Output:         time,fastTime,line,lastLine   
+Return:         空 
+Others:           
+*************************************************/
+void FastestWay(double a[][MAXASSEMBLE], double t[][MAXASSEMBLE], double* e, double* x, int n, 
+				double &time, double fastTime[][MAXASSEMBLE],int line[][MAXASSEMBLE], int &lastLine)
+{
+    fastTime[0][0] = e[0] + a[0][0];
+    fastTime[1][0] = e[1] + a[1][0];
+
+    for (int i = 1; i < n; ++i)
+    {
+        //choose the way according last way
+        if (fastTime[0][i-1] <= fastTime[1][i-1] + t[1][i-1])
+        {
+            fastTime[0][i] = fastTime[0][i-1] + a[0][i];
+            line[0][i] =  0;
+        }
+        else
+        {
+            fastTime[0][i] = fastTime[1][i-1] + t[1][i-1] + a[0][i];
+            line[0][i] = 1;
+        }
+
+        if (fastTime[1][i-1] < fastTime[0][i-1] + t[0][i-1])
+        {
+            fastTime[1][i] = fastTime[1][i-1] + a[1][i];
+            line[1][i] = 1;
+        }
+        else
+        {
+            fastTime[1][i] = fastTime[0][i-1] + t[0][i-1] + a[1][i];
+            line[1][i] = 0;
+        }
+    }
+    //choose the last step
+    if (fastTime[0][n-1] + x[0] < fastTime[1][n-1] + x[1])
+    {
+        time = fastTime[0][n-1] + x[0];
+        lastLine = 0;
+    }
+    else
+    {
+        time = fastTime[1][n-1] + x[1];
+        lastLine = 1;
+    }
+}
+/**
+ * @brief Print the path
+ *
+ * @param lastLine: the pre-station's AssemblyLine number of the end station
+ * @param line[][MAXASSEMBLE]: the path matrix
+ * @param n: the number of stations in one AssemblyLine
+ */
+//void PrintPath(int lastLine, int line[][MAXASSEMBLE], int n)
+//{
+//    cout << n << " step: " << lastLine + 1 << endl;
+//	//int *way = (int*)malloc(n * sizeof(int));
+//	//way[n-1] = lastLine;
+//    while (--n > 1)
+//    {
+//		//way[n-1] = line[lastLine][n-1];
+//		//lastLine = line[lastLine][n-1];
+//        cout << n << " step: " << line[lastLine][n-1] + 1 << endl;
+//        lastLine = line[lastLine][n-1];
+//    }
+//	
+//	//cout << "The path is " << endl;
+//	//for(int i = 0; i < n; i ++)
+//	//{
+//	//	cout << way[i] << " ";
+//	//}
+//	//cout << endl;
+//}
+
+/*************************************************   
+Function:       PrintStation    
+Description:    打印路径
+Calls:          无
+Called By:      main   
+Input:          @param line[][MAXASSEMBLE]: line[i][j] means the pre-station's AssemblyLine number of station j+1 in AssemblyLine i.   
+				@param stations：站数目
+				@param lastline：最后一个加工的站所在专配线
+Output:         无   
+Return:         空  
+Others:           
+*************************************************/
+void PrintStation(int line[][MAXASSEMBLE], int stations, int lastline)
+{
+    int i = lastline;
+    //cout << "line " << i + 1 << ",station " << stations - 1 << endl;
+	cout << "line " << i + 1 << ",station " << stations << endl;
+    for (int j = stations - 1; j >= 1; j--)
+    {
+        i = line[i][j];
+		//cout << "line " << i + 1 << ",station " << j - 1 << endl;
+        cout << "line " << i + 1 << ",station " << j << endl;
+    }
+}
+
+void printFastTime(double fastTime[][MAXASSEMBLE],int lineSize,int Stations)
+{
+	for (int j = 0; j < lineSize; j++)
+	{
+		for (int i = 0; i < Stations; i++)
+		{
+			cout << fastTime[j][i] << " ";
+		}
+		cout << endl;	
+	}
+
+}
+
+void printLine(int line[][MAXASSEMBLE],int lineSize,int Stations)
+{
+	for (int j = 0; j < lineSize; j++)
+	{
+		for (int i = 1; i < Stations; i++)
+		{
+			cout << line[j][i] + 1 << " ";
+		}
+		cout << endl;	
+	}
+
+}
+/*************************************************   
+Function:       main    
+Description:    装配线问题
+Calls:          FastestWay求最短路径和最短时间
+Called By:          
+Input:          无   
+Output:         无   
+Return:         程序结束标志0   
+Others:           
+*************************************************/
+int main()
+{
+    int n;
+    double a[2][MAXASSEMBLE];
+    double t[2][MAXASSEMBLE];
+	double fastTime[2][MAXASSEMBLE];
+    int line[2][MAXASSEMBLE];
+    int lastline;
+    double time;
+    double e[2];
+    double x[2];
+	
+
+    while (true)
+    {
+		cout << "请输入装配线上站的数目: ";
+		cin >> n;
+		if (0 == n)
+		{break;}
+		
+		cout << "请输入装配线1上每个站需要花费的时间: " << endl;
+        for (int i = 0; i < n; i++)
+        {
+            cin >> a[0][i];
+        }
+
+		cout << "请输入装配线2上每个站需要花费的时间: " << endl;
+        for (int i = 0; i < n; i++)
+        {
+            cin >> a[1][i];
+        }
+		
+		cout << "请输入从装配线1转到装配线2时花费的时间: " << endl;
+        for (int i = 0; i + 1 < n; i++)
+        {
+            cin >> t[0][i];
+        }
+
+		cout << "请输入从装配线2转到装配线1时花费的时间: " << endl;
+        for (int i = 0; i + 1 < n; i++)
+        {
+            cin >> t[1][i];
+        }
+		
+		cout << "请分别输入汽车底盘放上装配线1和2的时间: " << endl;
+        cin >> e[0] >> e[1];
+		cout << "请分别输入汽车底盘从装配线1和2卸下的时间: " << endl;
+		cin >> x[0] >> x[1];
+
+        FastestWay(a, t, e, x, n, time, fastTime,line, lastline);
+        cout << "Least time: " << time << endl;
+        //PrintPath(lastline, line, n);
+		PrintStation(line,n,lastline);
+		cout << endl;
+		printFastTime(fastTime,2,n);
+		cout << endl;
+		printLine(line,2,n);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <iostream>
+using namespace std;
+
+/*
+	参数为：在每个站台耗费的时间， 转换线路时间， 进站时间， 出站时间
+*/
+void fast_way(int a[][3], int t[][3], int e[], int x[], int n);//最快路径
+
+void print_station(int n, int line);//打印站点
+
+int L = 1;			//出口
+int optimalF = 0;	//最优解
+int f[6][3] = {0};
+int l[6][3] = {0};
+
+int main()
+{
+
+	//进出时间
+	int e[3] = {0};
+	int x[3] = {0};
+
+	cout << "请输入进入station的时间e1,e2:" << endl;
+	cin >> e[1] >> e[2];
+
+	cout << "请输入出station的时间x1,x2:" << endl;
+	cin >> x[1] >> x[2];
+
+
+	//转站台时间
+	int t[6][3];
+	cout << "请输入从s1转到s2的时间t1,1到t1,6的时间x1,x2:" << endl;
+	for (int i = 0; i < 5; i++)
+	{
+		cin >> t[i+1][1];
+	}
+	cout << "请输入从s2转到s1的时间t2,1到t2,6的时间x1,x2:" << endl;
+	for (int i = 0; i < 5; i++)
+	{
+		cin >> t[i+1][2];
+	}
+
+
+	//站台处理时间
+	int a[7][3];
+	cout << "请输入a1,1-a1,6:" << endl;
+	for (int i = 0; i < 6; i++)
+	{
+		cin >> a[i+1][2];
+	}
+	cout << "请输入a1,1-a1,6:" << endl;
+	for (int i = 0; i < 6; i++)
+	{
+		cin >> a[i+1][2];
+	}
+
+	fast_way(a,t,e,x,6);
+	print_station(6, L);
+
+	return 0;
+}
+
+void fast_way(int a[][3], int t[][3], int e[], int x[], int n)
+{
+	f[1][1] = e[1] + a[1][1];
+	f[1][2] = e[2] + a[2][1];
+	for (int j = 2; j < n; j++)
+	{
+		if (f[j-1][1] + a[j][1] <= f[j-1][2] + t[j-1][2] + a[j][1])
+		{
+			f[j][1] = f[j-1][1] + a[j][1];
+			l[j][1] = 1;
+		}
+		else
+		{
+			f[j][1] = f[j-1][2] + t[j-1][2] + a[j][2];
+			l[j][1] = 2;
+		}
+		if (f[j-1][2] + a[j][2] <= f[j-1][2] + t[j-1][1] + a[j][2])
+		{
+			f[j][2] = f[j-1][2] + a[j][2];
+			l[j][2] = 2;
+		}
+		else
+		{
+			f[j][2] = f[j-1][1] + t[j-1][1] + a[j][1];
+			l[j][2] = 1;
+		}
+	}
+	if (f[n][1] + x[1] <= f[n][2] + x[2])
+	{
+		optimalF = f[n][1] + x[1];
+		L = 1;
+	}
+	else
+	{
+		optimalF = f[n][2] + x[2];
+		L = 2;
+	}
+}
+
+
+void print_station(int n, int line)
+{
+	int i = line;
+	cout << "line" << i << ",station" << n << endl;
+	for (int j = n-1; j >= 1; j--)
+	{
+		i = l[j][i];
+		cout << "line" << i << ",station" << j << endl;
+	}
+}

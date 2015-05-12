@@ -1,0 +1,10 @@
+key:30337	value:21054
+key:26314	value:31711
+key:20828	value:23054
+key:20017	value:23744
+key:19761	value:18733
+key:17286	value:7751
+key:9966	value:8219
+key:4192	value:21567
+key:1160	value:28908
+key:589	value:9862
