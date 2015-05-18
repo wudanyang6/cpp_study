@@ -8,16 +8,15 @@ struct activityTime  //结构体类型的说明与定义分开。 声明
 {
 int sTime;	
 int fTime;   
-//activityTime* next;
 };
 
 int resultNum = 0;
 
-/*
-	参数为：activityTime times[]活动时间 activityTime result[]结果 int arrNum总活动数 int i开始, int j结束
-	返回结果数量
+	/*
+		参数为：activityTime times[]活动时间 activityTime result[]结果 int arrNum总活动数 int i开始, int j结束
 	*/
-void recursive_activity_selector(activityTime times[],activityTime result[], int arrNum, int i, int j);//递归地求解
+void recursive_activity_selector(activityTime times[], activityTime result[], int arrNum, int i, int j);//递归地求解
+int greedy_activity_selector(activityTime times[], activityTime result[], int arrNum);//贪婪算法
 
 int main()
 {
@@ -79,6 +78,13 @@ int main()
 		
 	}
 
+	//贪婪算法求解
+
+	/*for (int i = 0; i < greedy_activity_selector(arr, result, numNum); i++)
+	{
+		cout << "s:" << result[i].sTime << "f:" << result[i].fTime << endl;
+	}*/
+
 	//递归求解
 	recursive_activity_selector(arr, result, numNum, 0, numNum+1);
 
@@ -97,7 +103,6 @@ int main()
 
 void recursive_activity_selector(activityTime times[],activityTime result[], int arrNum, int i, int j)
 {
-	activityTime *returnTime = NULL;
 	int m = i + 1;
 	while (m < j && times[m].sTime < times[i].fTime)
 	{
@@ -115,4 +120,23 @@ void recursive_activity_selector(activityTime times[],activityTime result[], int
 			}
 		}	
 	}
+}
+
+int greedy_activity_selector(activityTime times[], activityTime result[], int arrNum)
+{
+	int m, i = 1;
+	int resultNum = 0;
+	result[resultNum].sTime = times[1].sTime;
+	result[resultNum].fTime = times[1].fTime;
+	for (m = 2; m < arrNum; m++)
+	{
+		if (times[m].sTime >= times[i].fTime)
+		{
+			resultNum++;
+			result[resultNum].sTime = times[m].sTime;
+			result[resultNum].fTime = times[m].fTime;
+			i = m;
+		}
+	}
+	return resultNum;
 }
